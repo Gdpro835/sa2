@@ -1,0 +1,77 @@
+name: Build SA2 for Windows
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install system dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y \
+          build-essential \
+          binutils-arm-none-eabi \
+          gcc-arm-none-eabi \
+          libpng-dev \
+          xorg-dev \
+          libsdl2-dev \
+          g++-mingw-w64 \
+          gcc-mingw-w64 \
+          libarchive-tools \
+          wine \
+          wget \
+          unzip
+
+    - name: Download SDL2 for Windows (if needed)
+      run: |
+        mkdir -p ext
+        cd ext
+        wget -q https://github.com/libsdl-org/SDL/releases/download/release-2.30.3/SDL2-devel-2.30.3-mingw.zip
+        unzip -q SDL2-devel-2.30.3-mingw.zip
+        mv SDL2-2.30.3 SDL2
+        cd ..
+
+    - name: Build SDL2.dll
+      run: |
+        make SDL2.dll
+
+    - name: Build Windows port
+      run: |
+        make sdl_win32 -j$(nproc)
+
+    - name: Build GBA ROM (optional check)
+      run: |
+        git clone https://github.com/SAT-R/agbcc
+        cd agbcc
+        ./build.sh
+        ./install.sh $GITHUB_WORKSPACE
+        cd ..
+        make -j$(nproc) || echo "GBA build failed, but Windows build may still work"
+
+    - name: Upload Windows executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: sa2-windows-port
+        path: |
+          sa2.sdl_win32.exe
+          SDL2.dll
+        if-no-files-found: error
+
+    - name: Upload GBA ROM (if built successfully)
+      uses: actions/upload-artifact@v4
+      with:
+        name: sa2-gba-rom
+        path: sa2.gba
+        if-no-files-found: warn
