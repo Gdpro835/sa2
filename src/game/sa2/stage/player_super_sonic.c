@@ -342,12 +342,13 @@ static void Task_802BC10(void)
     }
 }
 
-// (99.25%) https://decomp.me/scratch/2dbbE
-NONMATCH("asm/non_matching/game/sa2/super_sonic__sub_802BCCC.inc", void sub_802BCCC(struct SuperSonic *sonic))
+void sub_802BCCC(struct SuperSonic *sonic)
 {
     s32 ssx, ssx2;
     u8 i;
     u8 *id;
+    s32 *historyX;
+    s32 *historyY;
     u8 id2;
 
     if (!(sonic->flags & SUPER_FLAG__10)) {
@@ -361,6 +362,8 @@ NONMATCH("asm/non_matching/game/sa2/super_sonic__sub_802BCCC.inc", void sub_802B
     // _0802BD0E
 
     ssx2 = Q(gUnknown_080D650C[gCurrentLevel][0]);
+    historyX = &sonic->unk28[0].x;
+    historyY = &sonic->unk28[0].y;
     id = &sonic->unk128;
 
     if (ssx >= ssx2) {
@@ -396,11 +399,10 @@ NONMATCH("asm/non_matching/game/sa2/super_sonic__sub_802BCCC.inc", void sub_802B
     sonic->worldX = ssx;
 
     id2 = *id;
-    sonic->unk28[id2].x = sonic->worldX;
-    sonic->unk28[id2].y = sonic->worldY;
+    *(s32 *)((uintptr_t)historyX + (id2 << 3)) = sonic->worldX;
+    *(s32 *)((uintptr_t)historyY + (id2 << 3)) = sonic->worldY;
     *id = (id2 + 1) % ARRAY_COUNT(sonic->unk28);
 }
-END_NONMATCH
 
 static void sub_802BE1C(struct SuperSonic *sonic)
 {
