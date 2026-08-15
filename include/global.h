@@ -61,7 +61,12 @@ typedef void (*VoidFn)(void);
 #define TEMP_FIX 0
 #endif
 
-#ifdef NON_MATCHING
+#if defined(FORCE_C_NONMATCH)
+// Decompilation aid: compile NONMATCH bodies as C while retaining matching-only
+// register hints guarded by `#ifndef NON_MATCHING`.
+#define NONMATCH(path, decl) decl
+#define END_NONMATCH
+#elif defined(NON_MATCHING)
 #define NONMATCH(path, decl) decl
 #define END_NONMATCH
 #else
