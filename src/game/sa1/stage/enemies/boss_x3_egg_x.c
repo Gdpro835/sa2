@@ -2342,10 +2342,14 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_x3__Task_8039A64.inc", vo
 }
 END_NONMATCH
 
-// (99.10%) https://decomp.me/scratch/xmkJN
-NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_x3__sub_803A170.inc", void sub_803A170(u32 arg0))
+void sub_803A170(u32 arg0)
 {
+#ifndef NON_MATCHING
+    register s16 var_r0 asm("r0");
+#else
     s16 var_r0;
+#endif
+    u8 *unk61;
 
     gPlayer.timerInvulnerability = 0x78;
     if (arg0 != 0) {
@@ -2361,10 +2365,14 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_x3__sub_803A170.inc", voi
     Player_HandleSpriteYOffsetChange(&gPlayer, 0xE);
     gPlayer.spriteOffsetX = 6;
     gPlayer.spriteOffsetY = 0xE;
-    gPlayer.SA2_LABEL(unk61) = 0;
+    unk61 = &gPlayer.SA2_LABEL(unk61);
+    var_r0 = 0;
+#ifndef NON_MATCHING
+    asm("" : "+r"(var_r0));
+#endif
+    *unk61 = var_r0;
     gPlayer.SA2_LABEL(unk62) = 0;
 }
-END_NONMATCH
 
 void sub_803A1D8()
 {
