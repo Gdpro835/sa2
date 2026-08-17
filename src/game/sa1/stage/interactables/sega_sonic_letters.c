@@ -7,6 +7,9 @@
 
 #include "constants/sa1/animations.h"
 
+// Keep agbcc from treating these fixed-size copies as compiler intrinsics.
+extern void *SegaSonicMemcpy(void *dest, const void *src, size_t size) asm("memcpy");
+
 typedef struct {
     SpriteBase base;
     Sprite s;
@@ -22,22 +25,13 @@ void TaskDestructor_SegaSonicLetter(Task *t);
 
 ALIGNED(8) const u16 gUnknown_086CED90[] = { 500, 0x190, 0x12C };
 
-// (100.0%) https://decomp.me/scratch/AVFO8
-// It's just the memcpy...
-NONMATCH("asm/non_matching/game/sa1/stage/interactables/CreateEntity_SegaSonicLetter.inc",
-         void CreateEntity_SegaSonicLetter(MapEntity *me, u16 regionX, u16 regionY, u8 id))
+void CreateEntity_SegaSonicLetter(MapEntity *me, u16 regionX, u16 regionY, u8 id)
 {
     Task *t;
     Letter *letter;
     Sprite *s;
-#if 0
-    // This matches... but can't be right, the data is used in Task_SegaSonicLetter
-    u16 arr[3] = { 500, 400, 300 };
-#else
-    // memcpy gets optimized away...
     u16 arr[3];
-    memcpy(arr, gUnknown_086CED90, sizeof(arr));
-#endif
+    SegaSonicMemcpy(arr, gUnknown_086CED90, sizeof(arr));
     t = TaskCreate(Task_SegaSonicLetter, sizeof(Letter), 0x2000, 0, TaskDestructor_SegaSonicLetter);
     letter = TASK_DATA(t);
     s = &letter->s;
@@ -74,11 +68,8 @@ NONMATCH("asm/non_matching/game/sa1/stage/interactables/CreateEntity_SegaSonicLe
     s->frameFlags = SPRITE_FLAG(PRIORITY, 2);
     UpdateSpriteAnimation(s);
 }
-END_NONMATCH
 
-// (100.0%) https://decomp.me/scratch/AF9HF
-// It's just the memcpy...
-NONMATCH("asm/non_matching/game/sa1/stage/interactables/Task_SegaSonicLetter.inc", void Task_SegaSonicLetter(void))
+void Task_SegaSonicLetter(void)
 {
     Letter *letter;
     Sprite *s;
@@ -88,14 +79,8 @@ NONMATCH("asm/non_matching/game/sa1/stage/interactables/Task_SegaSonicLetter.inc
     s32 sl; // isSolid?
     u32 r1;
 
-#if 0
-    // This matches... but can't be right, the data is used in CreateEntity_SegaSonicLetter
-    AnimId arr[3] = { 500, 400, 300 };
-#else
-    // memcpy gets optimized away...
     AnimId arr[3];
-    memcpy(arr, gUnknown_086CED90, sizeof(arr));
-#endif
+    SegaSonicMemcpy(arr, gUnknown_086CED90, sizeof(arr));
 
     letter = TASK_DATA(gCurTask);
     s = &letter->s;
@@ -167,7 +152,6 @@ NONMATCH("asm/non_matching/game/sa1/stage/interactables/Task_SegaSonicLetter.inc
     UpdateSpriteAnimation(s);
     DisplaySprite(s);
 }
-END_NONMATCH
 
 void TaskDestructor_SegaSonicLetter(Task *t)
 {
