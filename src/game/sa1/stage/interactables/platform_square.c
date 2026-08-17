@@ -575,9 +575,7 @@ NONMATCH("asm/non_matching/game/sa1/stage/interactables/platform_sq__Task_Barrel
 }
 END_NONMATCH
 
-// (99.24%) https://decomp.me/scratch/5MxXq
-NONMATCH("asm/non_matching/game/sa1/stage/interactables/platform_sq__sub_807E914.inc",
-         bool32 sub_807E914(Sprite *s, s32 worldX, s32 worldY, Rect8 *rect, Player *p))
+bool32 sub_807E914(Sprite *s, s32 worldX, s32 worldY, Rect8 *rect, Player *p)
 {
     if (HB_COLLISION(worldX, worldY, s->hitboxes[0].b, I(p->qWorldX), I(p->qWorldY), (*rect))) {
         // _0807E9AA
@@ -608,8 +606,18 @@ NONMATCH("asm/non_matching/game/sa1/stage/interactables/platform_sq__sub_807E914
                 p->moveState &= ~MOVESTATE_STOOD_ON_OBJ;
 
                 return TRUE;
-            } else if (playerX >= (worldX + s->hitboxes[0].b.right - rect->left) - 7) {
-                qPlayerX = ((worldX + s->hitboxes[0].b.right - rect->left) + 1);
+            } else {
+#ifndef NON_MATCHING
+                register s32 rightX asm("r0") = worldX + s->hitboxes[0].b.right - rect->left;
+#else
+                s32 rightX = worldX + s->hitboxes[0].b.right - rect->left;
+#endif
+
+                if (playerX < rightX - 7) {
+                    return FALSE;
+                }
+
+                qPlayerX = rightX + 1;
                 p->qWorldX = Q(qPlayerX);
 
                 res = SA2_LABEL(sub_801E4E4)(playerY + 9, I(p->qWorldX), p->layer, +8, NULL, SA2_LABEL(sub_801EE64));
@@ -634,7 +642,6 @@ NONMATCH("asm/non_matching/game/sa1/stage/interactables/platform_sq__sub_807E914
 
     return FALSE;
 }
-END_NONMATCH
 
 void TaskDestructor_Platform_Square(Task *t)
 {

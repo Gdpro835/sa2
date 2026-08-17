@@ -53,7 +53,12 @@ def find_symbol(objdump: str, object_file: Path, symbol: str) -> tuple[int, int]
 
 
 def canonical_disassembly(objdump: str, object_file: Path, symbol: str) -> list[str]:
-    start, size = find_symbol(objdump, object_file, symbol)
+    start, symbol_size = find_symbol(objdump, object_file, symbol)
+    # Handwritten NONMATCH assembly commonly includes its final `.align 2, 0`
+    # bytes in the symbol size, while agbcc excludes equivalent inter-function
+    # padding from a C symbol. Compare through the next word boundary so both
+    # representations cover the same ROM bytes.
+    size = (symbol_size + 3) & ~3
     output = run(
         [
             objdump,

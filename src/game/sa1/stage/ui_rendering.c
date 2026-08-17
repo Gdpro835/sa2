@@ -197,14 +197,14 @@ void sub_8052C84(const char *param0, Strc_8052C84 *param1)
     }
 }
 
-// (97.98%) https://decomp.me/scratch/z75P3
-NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_8052D64.inc", void sub_8052D64(u8 *param0, Strc_8052C84 *param1))
+void sub_8052D64(u8 *param0, Strc_8052C84 *param1)
 {
     Strc0 *strc0;
     u32 u8;
     OamData sp00;
     OamData *oamStack;
     OamData *oamStack2;
+    OamData *attr2Stack;
     s32 a;
     s32 sp08, r9;
     s32 r8;
@@ -226,8 +226,15 @@ NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_8052D64.inc", void sub_80
         r9 = 3;
 
         oamStack = &sp00;
+#ifndef NON_MATCHING
+        asm("" : "+r"(oamStack));
+#endif
         oamStack->all.attr0 = ((r9 << 8) | (strc0->unk9 << 14)) | (param1->unkC & 0xFF);
-        oamStack->all.attr2 = (param1->unk12 << 12) | (strc0->unk0 & 0x3FF);
+        attr2Stack = &sp00;
+#ifndef NON_MATCHING
+        asm("" : "+r"(attr2Stack));
+#endif
+        attr2Stack->all.attr2 = (param1->unk12 << 12) | (strc0->unk0 & 0x3FF);
 
         for (i = 0, oamStack2 = &sp00; i < param1->byteCount; i++) {
             OamData *oam = OamMalloc((param1->unk8) >> 3);
@@ -242,7 +249,6 @@ NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_8052D64.inc", void sub_80
         }
     }
 }
-END_NONMATCH
 
 void sub_8052E40(u8 *param0, Strc_8052C84 *param1)
 {
@@ -570,9 +576,7 @@ NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_8053370.inc", void sub_80
 END_NONMATCH
 
 // TODO: The 2nd parameter's type is just a guess!
-//
-// (97.74%) https://decomp.me/scratch/fMp61
-NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_805345C.inc", void sub_805345C(u8 *param0, GameOverB *param1))
+void sub_805345C(u8 *param0, GameOverB *param1)
 {
     Strc0 *strc0;
     u32 u8;
@@ -592,10 +596,17 @@ NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_805345C.inc", void sub_80
     r8 = strc0->unkA * 8;
 
     oamStack = &sp00;
+#ifndef NON_MATCHING
+    asm("" : "+r"(oamStack));
+#endif
     a = (strc0->unk9 << 14) + (unsigned char)param1->unkC;
     oamStack->all.attr0 = a;
-    oamStack->all.attr1 = (strc0->unk8 << 14) + (param1->qUnkA & 0x1FF);
-    oamStack->all.attr2 = (param1->unk12 << 12) | (strc0->unk0 & 0x3FF) | 0x800;
+    oamStack2 = &sp00;
+#ifndef NON_MATCHING
+    asm("" : "+r"(oamStack2));
+#endif
+    oamStack2->all.attr1 = (strc0->unk8 << 14) + (param1->qUnkA & 0x1FF);
+    oamStack2->all.attr2 = (param1->unk12 << 12) | (strc0->unk0 & 0x3FF) | 0x800;
 
     for (i = 0; i < param1->unkE; i++) {
         OamData *oam = OamMalloc((param1->unk8 + i) >> 3);
@@ -610,7 +621,6 @@ NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_805345C.inc", void sub_80
         oam->all.attr2 = sp00.all.attr2 + FROM_UI_DIGIT(param0[i]) * strc0->unk4;
     }
 }
-END_NONMATCH
 
 void sub_8053520(u8 *param0, s32 param1, s32 param2, u8 param3, u8 param4)
 {
