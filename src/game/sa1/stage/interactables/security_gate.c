@@ -20,13 +20,18 @@ void Task_SecurityGate1(void);
 void Task_SecurityGate2(void);
 void TaskDestructor_SecurityGateMain(Task *t);
 
-// (97.55%) https://decomp.me/scratch/12dTu
-NONMATCH("asm/non_matching/game/sa1/stage/interactables/CreateEntity_SecurityGate.inc",
-         void CreateEntity_SecurityGate(MapEntity *me, u16 regionX, u16 regionY, u8 id))
+void CreateEntity_SecurityGate(MapEntity *me, u16 regionX, u16 regionY, u8 id)
 {
     Task *t = TaskCreate(Task_SecurityGateMain, sizeof(SecurityGate), 0x2000, 0, TaskDestructor_SecurityGateMain);
     SecurityGate *gate = TASK_DATA(t);
     Sprite *s = &gate->s;
+#ifndef NON_MATCHING
+    register u32 zeroR2 asm("r2");
+    register u32 zeroR1 asm("r1");
+#else
+    u32 zeroR2;
+    u32 zeroR1;
+#endif
 
     gate->base.regionX = regionX;
     gate->base.regionY = regionY;
@@ -46,14 +51,20 @@ NONMATCH("asm/non_matching/game/sa1/stage/interactables/CreateEntity_SecurityGat
     SET_MAP_ENTITY_INITIALIZED(me);
 
     s->graphics.dest = ALLOC_TILES(SA1_ANIM_SECURITY_GATE);
+    zeroR2 = 0;
+    zeroR1 = 0;
     s->graphics.anim = SA1_ANIM_SECURITY_GATE;
-    s->variant = 0;
+    s->variant = zeroR2;
     s->oamFlags = SPRITE_OAM_ORDER(18);
-    s->graphics.size = 0;
-    SPRITE_INIT_SCRIPT(s, 1.0);
+    s->graphics.size = zeroR1;
+    s->animCursor = zeroR1;
+    s->qAnimDelay = zeroR1;
+    s->prevVariant = -1;
+    s->animSpeed = SPRITE_ANIM_SPEED(1.0);
+    s->palId = zeroR2;
+    s->hitboxes[0].index = HITBOX_STATE_INACTIVE;
     s->frameFlags = SPRITE_FLAG(PRIORITY, 2);
 }
-END_NONMATCH
 
 void Task_SecurityGateMain(void)
 {
