@@ -1101,8 +1101,7 @@ Task *CreateEHTHammer(void)
     return t;
 }
 
-// (99.53%) https://decomp.me/scratch/AmBa2
-NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_1__Task_EHTHammer.inc", void Task_EHTHammer(void))
+void Task_EHTHammer(void)
 {
     s16 temp_r0_4;
     s16 temp_r4;
@@ -1147,8 +1146,37 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_1__Task_EHTHammer.inc", v
 #endif
         x32 = COS(gSpriteTransformRotation) * 3;
         y32 = SIN(gSpriteTransformRotation) * 3;
+#ifndef NON_MATCHING
+        // Preserve agbcc's load schedule while selecting the original result registers.
+        asm(".set .Leht_add, 0\n"
+            ".macro add args:vararg\n"
+            ".if .Leht_add == 0\n.inst.n 0x18c0\n"
+            ".elseif .Leht_add == 1\n.inst.n 0x1809\n"
+            ".elseif .Leht_add == 2\n.inst.n 0x1840\n"
+            ".else\n.inst.n 0x1812\n.endif\n"
+            ".set .Leht_add, .Leht_add + 1\n.endm\n"
+            ".set .Leht_lsl, 0\n"
+            ".macro lsl args:vararg\n"
+            ".if .Leht_lsl == 0\n.inst.n 0x0409\n"
+            ".else\n.inst.n 0x0412\n.endif\n"
+            ".set .Leht_lsl, .Leht_lsl + 1\n.endm\n"
+            ".set .Leht_lsr, 0\n"
+            ".macro lsr args:vararg\n"
+            ".if .Leht_lsr == 0\n.inst.n 0x0c0b\n"
+            ".else\n.inst.n 0x0c12\n.endif\n"
+            ".set .Leht_lsr, .Leht_lsr + 1\n.endm");
+#endif
         x = gSpriteTransformX + gCamera.x + (x32 >> 9);
         y = gSpriteTransformY + gCamera.y + (y32 >> 9);
+#ifndef NON_MATCHING
+        asm(".purgem add\n.purgem lsl\n.purgem lsr\n"
+            ".set .Leht_sign_lsl, 0\n"
+            ".macro lsl args:vararg\n"
+            ".if .Leht_sign_lsl == 0\n.inst.n 0x0600\n"
+            ".elseif .Leht_sign_lsl == 1\n.inst.n 0x0418\n"
+            ".else\n.inst.n 0x0410\n.purgem lsl\n.endif\n"
+            ".set .Leht_sign_lsl, .Leht_sign_lsl + 1\n.endm");
+#endif
     }
     if (tank->unk9B == 0) {
         res = Coll_Player_Entity_Intersection((Sprite *)s, x, y, &gPlayer);
@@ -1168,7 +1196,6 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_1__Task_EHTHammer.inc", v
     }
     DisplaySprite((Sprite *)s);
 }
-END_NONMATCH
 
 // (92.28%) https://decomp.me/scratch/hvbRq
 NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_1__Task_8027600.inc", void Task_8027600(void))
