@@ -168,17 +168,20 @@ void Task_FireballExtinguish(void)
     SPRITE_FLAG_CLEAR(s, X_FLIP);
 }
 
-// Reg-swap
-// (99.61%) https://decomp.me/scratch/MmGb6
-NONMATCH("asm/non_matching/game/sa1/stage/enemies/fireball__CreateFireballSparks.inc", void CreateFireballSparks(s16 screenX, s16 screenY))
+void CreateFireballSparks(s16 screenX, s16 screenY)
 {
     Task *t;
     FireballSpark *spark;
     Sprite *s;
+#ifndef NON_MATCHING
+    register s32 i asm("r6");
+#else
     s32 i;
+#endif
     s32 v;
 
-    for (i = 0; i < NUM_SPARKS; i++) {
+    i = 0;
+    do {
         t = TaskCreate(Task_FireballSpark, sizeof(FireballSpark), 0x3000, 0, NULL);
         spark = TASK_DATA(t);
         s = &spark->s;
@@ -213,9 +216,9 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/fireball__CreateFireballSparks
         s->frameFlags = SPRITE_FLAG(PRIORITY, 2);
 
         UpdateSpriteAnimation(s);
-    }
+        i++;
+    } while (i < NUM_SPARKS);
 }
-END_NONMATCH
 
 void Task_FireballSpark(void)
 {
