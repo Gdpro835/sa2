@@ -144,9 +144,7 @@ static void Task_Idle(void)
     DisplaySprite(s);
 }
 
-// (95.52%) https://decomp.me/scratch/RaPDV
-// (99.80%) https://decomp.me/scratch/zEnJP
-NONMATCH("asm/non_matching/game/sa2/stage/interactables/leaf_forest/Task_Rotating.inc", void Task_Rotating())
+void Task_Rotating(void)
 {
     MapEntity *me;
     Sprite *sprite;
@@ -159,6 +157,26 @@ NONMATCH("asm/non_matching/game/sa2/stage/interactables/leaf_forest/Task_Rotatin
 
     s32 cos;
     s32 sin;
+
+#ifndef NON_MATCHING
+    // Keep agbcc's allocation while exchanging the r8/sl encodings used by
+    // rotatingHandle and the sine-period mask.
+    asm(".macro mov dst, src\n"
+        ".ifc \\dst\\src,r8r0\n.short 0x4682\n.else\n"
+        ".ifc \\dst\\src,r3r8\n.short 0x4653\n.else\n"
+        ".ifc \\dst\\src,r1r8\n.short 0x4651\n.else\n"
+        ".ifc \\dst\\src,slr3\n.short 0x4698\n.else\n"
+        ".ifc \\dst\\src,r2r8\n.short 0x4652\n.else\n"
+        ".ifc \\dst\\src,r2sl\n.short 0x4642\n.else\n"
+        ".ifc \\dst\\src,r0sl\n.short 0x4640\n.else\n"
+        ".ifc \\dst\\src,r1sl\n.short 0x4641\n.else\n"
+        ".ifc \\dst\\src,r9r1\n.short 0x4689\n.else\n"
+        ".ifc \\dst\\src,r3r9\n.short 0x464b\n.else\n"
+        ".ifc \\dst\\src,r0r9\n.short 0x4648\n.else\n"
+        "movs \\dst, \\src\n"
+        ".endif\n.endif\n.endif\n.endif\n.endif\n.endif\n"
+        ".endif\n.endif\n.endif\n.endif\n.endif\n.endm");
+#endif
 
     rotatingHandle = TASK_DATA(gCurTask);
     // asm("":::"r8", "r9");
@@ -287,8 +305,10 @@ NONMATCH("asm/non_matching/game/sa2/stage/interactables/leaf_forest/Task_Rotatin
 
     UpdateSpriteAnimation(sprite);
     DisplaySprite(sprite);
+#ifndef NON_MATCHING
+    asm(".purgem mov");
+#endif
 }
-END_NONMATCH
 
 static void Task_AfterJump(void)
 {
