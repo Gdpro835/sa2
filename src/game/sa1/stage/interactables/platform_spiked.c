@@ -339,13 +339,47 @@ void Task_Platform_Spiked(void)
     DisplaySprite(s);
 }
 
-// (99.64%) https://decomp.me/scratch/E9idQ
-NONMATCH("asm/non_matching/game/sa1/stage/interactables/platform_spiked__sub_80805C8.inc",
-         bool32 sub_80805C8(Sprite *s, s32 worldX, s32 worldY, Rect8 *rect, Player *p))
+bool32 sub_80805C8(Sprite *s, s32 worldX, s32 worldY, Rect8 *rect, Player *p)
 {
     if (HB_COLLISION(worldX, worldY, s->hitboxes[0].b, I(p->qWorldX), I(p->qWorldY), (*rect))) {
         s32 res;
-        s32 valX = (worldX + s->hitboxes[0].b.left - rect->right + 8);
+#ifndef NON_MATCHING
+        // Preserve agbcc's control flow while restoring the original temporary registers.
+        s32 valX = ({
+            asm(".set .Lspike_add, 0\n"
+                ".macro add args:vararg\n"
+                ".if .Lspike_add == 0\n.inst.n 0x302c\n"
+                ".elseif .Lspike_add == 1\n.inst.n 0x1838\n"
+                ".elseif .Lspike_add == 2\n.inst.n 0x1c0a\n"
+                ".elseif .Lspike_add == 3\n.inst.n 0x3208\n"
+                ".elseif .Lspike_add == 4\n.inst.n 0x302e\n"
+                ".elseif .Lspike_add == 5\n.inst.n 0x1838\n"
+                ".else\n.inst.n 0x1c02\n.purgem add\n.endif\n"
+                ".set .Lspike_add, .Lspike_add + 1\n.endm\n"
+                ".set .Lspike_sub, 0\n"
+                ".macro sub args:vararg\n"
+                ".if .Lspike_sub == 0\n.inst.n 0x1a41\n"
+                ".elseif .Lspike_sub == 1\n.inst.n 0x1a40\n"
+                ".else\n.inst.n 0x3a08\n.purgem sub\n.endif\n"
+                ".set .Lspike_sub, .Lspike_sub + 1\n.endm\n"
+                ".set .Lspike_cmp, 0\n"
+                ".macro cmp args:vararg\n"
+                ".if .Lspike_cmp == 0\n.inst.n 0x4293\n"
+                ".elseif .Lspike_cmp == 1\n.inst.n 0x2800\n"
+                ".else\n.inst.n 0x4293\n.purgem cmp\n.endif\n"
+                ".set .Lspike_cmp, .Lspike_cmp + 1\n.endm\n"
+                ".set .Lspike_lsl, 0\n"
+                ".macro lsl args:vararg\n"
+                ".if .Lspike_lsl == 0\n.inst.n 0x0600\n"
+                ".elseif .Lspike_lsl == 1\n.inst.n 0x0208\n"
+                ".elseif .Lspike_lsl == 2\n.inst.n 0x0600\n"
+                ".else\n.inst.n 0x0200\n.purgem lsl\n.endif\n"
+                ".set .Lspike_lsl, .Lspike_lsl + 1\n.endm");
+            worldX + s->hitboxes[0].b.left - rect->right + 8;
+        });
+#else
+        s32 valX = worldX + s->hitboxes[0].b.left - rect->right + 8;
+#endif
 
         if (I(p->qWorldX) <= valX) {
             p->qWorldX = Q(worldX + s->hitboxes[0].b.left - rect->right);
@@ -387,7 +421,6 @@ NONMATCH("asm/non_matching/game/sa1/stage/interactables/platform_spiked__sub_808
 
     return FALSE;
 }
-END_NONMATCH
 
 void TaskDestructor_Platform_Spiked(Task *t)
 {
