@@ -241,13 +241,16 @@ void sub_8031F74()
     }
 }
 
-// (96.34%) https://decomp.me/scratch/ULduN
-NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_6__CreateEntity_EggSnake.inc",
-         void CreateEntity_EggSnake(MapEntity *me, u16 regionX, u16 regionY, u8 id))
+void CreateEntity_EggSnake(MapEntity *me, u16 regionX, u16 regionY, u8 id)
 {
     EggSnake *boss;
     Sprite *s;
     Sprite *s2;
+#ifndef NON_MATCHING
+    register u32 frameFlags asm("r8");
+#else
+    u32 frameFlags;
+#endif
 
     if (IS_MULTI_PLAYER) {
         SET_MAP_ENTITY_INITIALIZED(me);
@@ -290,7 +293,8 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_6__CreateEntity_EggSnake.
     s->animSpeed = 0x10;
     s->palId = 0;
     s->hitboxes[0].index = -1;
-    s->frameFlags = 0x2000;
+    frameFlags = 0x2000;
+    s->frameFlags = frameFlags;
 
     s2 = &boss->s2;
     s2->x = TO_WORLD_POS(me->x, regionX);
@@ -307,14 +311,13 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_6__CreateEntity_EggSnake.
     s2->animSpeed = 0x10;
     s2->palId = 0;
     s2->hitboxes[0].index = -1;
-    s2->frameFlags = 0x2000;
+    s2->frameFlags = frameFlags;
 #if PORTABLE && (DISPLAY_WIDTH > 320)
     Bosses_SetCamBounds(s->y - (DISPLAY_HEIGHT - 32), s->y + 32, s->x - DISPLAY_CENTER_X, s->x + DISPLAY_CENTER_X);
 #else
     Bosses_SetCamBounds(s->y - (DISPLAY_HEIGHT - 32), s->y + 32, s->x - 144, s->x + 176);
 #endif
 }
-END_NONMATCH
 
 // (98.79%) https://decomp.me/scratch/34ZiA
 NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_6__Task_EggSnakeInit.inc", void Task_EggSnakeInit())
