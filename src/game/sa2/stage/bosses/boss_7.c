@@ -845,9 +845,7 @@ static void sub_8048BF0(EggFrog *boss)
     }
 }
 
-// https://decomp.me/scratch/aDy46
-// 98.5%, some register hacks get it very close. All instructions match
-NONMATCH("asm/non_matching/game/sa2/stage/bosses/boss_7__sub_8048C7C.inc", bool8 sub_8048C7C(EggFrog *boss))
+bool8 sub_8048C7C(EggFrog *boss)
 {
     const u16 **unk60 = (void *)boss->unk60;
     s16 *unk28 = boss->unk28;
@@ -861,8 +859,22 @@ NONMATCH("asm/non_matching/game/sa2/stage/bosses/boss_7__sub_8048C7C.inc", bool8
 
     u16 val = gUnknown_080D8710[boss->unk1B].unk0;
     u8 i;
+#ifndef NON_MATCHING
+    // Keep result at sp+0 while the saved output pointer occupies sp+4.
+    u8 result = ({
+        asm(".macro str reg, args:vararg\n"
+            ".ifc \\reg,r1\n.short 0x9100\n.endif\n"
+            ".ifc \\reg,r0\n.short 0x9000\n.endif\n"
+            ".ifc \\reg,r2\n.endif\n"
+            ".endm");
+        0;
+    });
+#else
     u8 result = 0;
-    u8 r6 = (boss->unk5C >> 0xC) + 1;
+#endif
+    u32 bossUnk5C = boss->unk5C;
+    u32 frame = bossUnk5C >> 0xC;
+    u8 r6 = frame + 1;
     u32 unk5C;
 
     if ((r6) > 7) {
@@ -872,8 +884,8 @@ NONMATCH("asm/non_matching/game/sa2/stage/bosses/boss_7__sub_8048C7C.inc", bool8
     r8 = 7;
 
     r6 &= 7;
-    unk5C = boss->unk5C & 0xFFF;
-    if (((boss->unk5C >> 0xC) & r8) != (((boss->unk5C - boss->unk58) >> 0xC) & r8)) {
+    unk5C = bossUnk5C & 0xFFF;
+    if ((frame & r8) != (((bossUnk5C - boss->unk58) >> 0xC) & r8)) {
 
         for (i = 0; i < 6; i++) {
             unk28[0] = unk28[1];
@@ -888,9 +900,17 @@ NONMATCH("asm/non_matching/game/sa2/stage/bosses/boss_7__sub_8048C7C.inc", bool8
         unk28 = boss->unk28;
     }
 
+#ifndef NON_MATCHING
+    asm(".macro lsr reg, args:vararg\n"
+        ".short 0x0c31\n.short 0x9201\n"
+        ".purgem lsr\n.endm\n"
+        ".macro ldr reg, args:vararg\n"
+        ".short 0x9a01\n"
+        ".purgem ldr\n.endm");
+#endif
     for (i = 0; i < 6; i++) {
 #ifndef NON_MATCHING
-        u16 *sp4[2];
+        u16 *volatile sp4[1];
         u16 r0;
         s16 *p1;
         u32 p2;
@@ -906,13 +926,20 @@ NONMATCH("asm/non_matching/game/sa2/stage/bosses/boss_7__sub_8048C7C.inc", bool8
 #endif
     }
 
+#ifndef NON_MATCHING
+    asm(".purgem str");
+#endif
     boss->unk58 = (((boss->unk58 - val) * 230) >> 8) + val;
     boss->unk5C += boss->unk58;
     boss->unk5C = (boss->unk5C & 0x7FFF);
 
+#ifndef NON_MATCHING
+    asm(".macro ldr reg, args:vararg\n"
+        ".short 0x9800\n"
+        ".purgem ldr\n.endm");
+#endif
     return result;
 }
-END_NONMATCH
 
 static void sub_8048D78(EggFrog *boss)
 {
