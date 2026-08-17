@@ -221,9 +221,7 @@ void CreateSlotProjectile(s16 worldX, s16 worldY)
     UpdateSpriteAnimation(s);
 }
 
-// Stack allocs
-// (99.88%) https://decomp.me/scratch/GHyrC
-NONMATCH("asm/non_matching/game/sa1/stage/enemies/Slot__Task_SlotProjectileMain.inc", void Task_SlotProjectileMain(void))
+void Task_SlotProjectileMain(void)
 {
     SlotProjectile *proj = TASK_DATA(gCurTask);
     Sprite *s = &proj->s;
@@ -266,22 +264,70 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/Slot__Task_SlotProjectileMain.
         unk34 = proj->qUnk34[0];
         proj->unk30 = 45;
 
+#ifndef NON_MATCHING
+        // Preserve agbcc's allocation while restoring the original three
+        // precomputed pointer stack slots.
+        asm(".set .Lslot_str, 0\n"
+            ".macro str args:vararg\n"
+            ".if .Lslot_str == 0\n.inst.n 0x900a\n"
+            ".elseif .Lslot_str == 1\n.inst.n 0x9206\n"
+            ".elseif .Lslot_str == 2\n.inst.n 0x9007\n"
+            ".elseif .Lslot_str == 3\n.inst.n 0x9208\n"
+            ".elseif .Lslot_str == 4\n.inst.n 0x900e\n"
+            ".elseif .Lslot_str == 5\n.inst.n 0x9209\n"
+            ".elseif .Lslot_str == 6\n.inst.n 0x900d\n"
+            ".elseif .Lslot_str == 7\n.inst.n 0x920c\n"
+            ".else\n.inst.n 0x900b\n.purgem str\n.endif\n"
+            ".set .Lslot_str, .Lslot_str + 1\n.endm");
+#endif
         for (i = 0; i < 6; i++) {
             s32 r4 = qUnk4C * 10; // ???
             s32 modRes = Mod(PSEUDO_RANDOM_32(), 4) + 0x10;
             s32 r0 = Div(-r4, modRes);
 
+#ifndef NON_MATCHING
+            asm(".macro ldr args:vararg\n.inst.n 0x9a06\n.purgem ldr\n.endm");
+#endif
             proj->qUnk4C[i] = (r0 * SIN(((sp08 * 4) & 0x7F) + 0x100)) / 20000;
+#ifndef NON_MATCHING
+            asm(".macro ldr args:vararg\n.inst.n 0x9907\n.purgem ldr\n.endm");
+#endif
             proj->unk58[i] = oldWorldX;
+#ifndef NON_MATCHING
+            asm(".set .Lslot_unk64_ldr, 0\n"
+                ".macro ldr args:vararg\n"
+                ".if .Lslot_unk64_ldr == 0\n.inst.n 0x9808\n"
+                ".else\n.inst.n 0x990a\n.purgem ldr\n.endif\n"
+                ".set .Lslot_unk64_ldr, .Lslot_unk64_ldr + 1\n.endm");
+#endif
             proj->unk64[i] = oldWorldY + sb;
+#ifndef NON_MATCHING
+            asm(".macro ldr args:vararg\n.inst.n 0x9a0e\n.purgem ldr\n.endm");
+#endif
             proj->qUnk34[i] = unk34;
+#ifndef NON_MATCHING
+            asm(".set .Lslot_unk70_ldr, 0\n"
+                ".macro ldr args:vararg\n"
+                ".if .Lslot_unk70_ldr == 0\n.inst.n 0x4929\n"
+                ".else\n.inst.n 0x9909\n.purgem ldr\n.endif\n"
+                ".set .Lslot_unk70_ldr, .Lslot_unk70_ldr + 1\n.endm");
+#endif
             proj->unk70[i] = Div(SIN(((sp08 - 24 + i * 8) * 4) & ONE_CYCLE), 30);
+#ifndef NON_MATCHING
+            asm(".macro ldr args:vararg\n.inst.n 0x9a0d\n.purgem ldr\n.endm");
+#endif
             proj->unk88[i] = 1;
         }
 
+#ifndef NON_MATCHING
+        asm(".macro ldr args:vararg\n.inst.n 0x990c\n.purgem ldr\n.endm");
+#endif
         s->prevVariant = -1;
         s->graphics.dest = VRAM_RESERVED_EN_SLOT_PROJ2;
         s->graphics.anim = SA1_ANIM_YUKIMARU_PROJ;
+#ifndef NON_MATCHING
+        asm(".macro ldr args:vararg\n.inst.n 0x9a0b\n.purgem ldr\n.endm");
+#endif
         s->variant = 0;
         gCurTask->main = sub_806E7E0;
     }
@@ -292,7 +338,6 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/Slot__Task_SlotProjectileMain.
     s->x = oldWorldX;
     s->y = oldWorldY;
 }
-END_NONMATCH
 
 void sub_806E7E0()
 {
