@@ -649,14 +649,18 @@ NONMATCH("asm/non_matching/game/sa1/ui/player_name_input_menu__sub_8058830.inc",
 }
 END_NONMATCH
 
-// (99.87%%) https://decomp.me/scratch/hkbKh
-NONMATCH("asm/non_matching/game/sa1/ui/player_name_input_menu__Task_80595DC.inc", void Task_80595DC(void))
+void Task_80595DC(void)
 {
     u32 temp_r5;
     u32 i, j;
     s32 var_r7 = 0;
     PlayerNameMenu *menu = TASK_DATA(gCurTask);
     Task *t;
+#ifndef NON_MATCHING
+    register s32 unkFC asm("r0");
+#else
+    s32 unkFC;
+#endif
 
     sub_805423C(&menu->strc18);
 
@@ -668,9 +672,16 @@ NONMATCH("asm/non_matching/game/sa1/ui/player_name_input_menu__Task_80595DC.inc"
     t = gCurTask;
 #endif
 
-    if (TASK_GET_MEMBER(PlayerNameMenu, t, s16, unkFC) > 60) {
+#ifndef NON_MATCHING
+    unkFC = (uintptr_t)&TASK_GET_MEMBER(PlayerNameMenu, t, s16, unkFC);
+    asm("mov r2, #0\n\tldrsh %0, [%0, r2]" : "+r"(unkFC) : : "r2");
+#else
+    unkFC = TASK_GET_MEMBER(PlayerNameMenu, t, s16, unkFC);
+#endif
+
+    if (unkFC > 60) {
         for (i = 0; i < 6; i++) {
-            temp_r5 = (TASK_GET_MEMBER(PlayerNameMenu, gCurTask, s16, unkC8[i][2]) - Q(32) - 1);
+            temp_r5 = (TASK_GET_MEMBER(PlayerNameMenu, gCurTask, s16, unkC8[i][0]) - Q(32) - 1);
             j = ((temp_r5 / 40u) * 10) + ((temp_r5 % 40u) / 2);
 
             if (LOADED_SAVE->playerName[i] != gUnknown_08688444[j]) {
@@ -740,4 +751,3 @@ NONMATCH("asm/non_matching/game/sa1/ui/player_name_input_menu__Task_80595DC.inc"
         CreatePlayerDataMenu();
     }
 }
-END_NONMATCH
