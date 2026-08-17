@@ -62,8 +62,7 @@ void CreateEntity_PartyBalloon(MapEntity *me, u16 regionX, u16 regionY, u8 id)
     UpdateSpriteAnimation(s);
 }
 
-// (99.96%) https://decomp.me/scratch/hdl15
-NONMATCH("asm/non_matching/game/sa1/stage/interactables/Task_PartyBalloon.inc", void Task_PartyBalloon(void))
+void Task_PartyBalloon(void)
 {
     PartyBalloon *balloon = TASK_DATA(gCurTask);
     Sprite *s = &balloon->s;
@@ -109,9 +108,9 @@ NONMATCH("asm/non_matching/game/sa1/stage/interactables/Task_PartyBalloon.inc", 
                 PLAYER(i).charState = CHARSTATE_SPRING_B;
 
                 if (i != 0) {
-                    gPlayerBodyPSI.s.prevVariant = -1;
-                } else {
                     gPartnerBodyPSI.s.prevVariant = -1;
+                } else {
+                    gPlayerBodyPSI.s.prevVariant = -1;
                 }
 
                 balloon->unk40 = 0x21;
@@ -144,12 +143,20 @@ NONMATCH("asm/non_matching/game/sa1/stage/interactables/Task_PartyBalloon.inc", 
             m4aSongNumStart(SE_BALLOON_POP);
             gCurTask->main = Task_PartyBalloonPopped;
         }
+#ifndef NON_MATCHING
+        // The original loop back-edge skips the one-time r9 initialization.
+        asm(".macro b target\n"
+            ".short 0xe000 | (((\\target + 4 - (. + 4)) >> 1) & 0x7ff)\n"
+            ".endm");
+#endif
     } while (++i < gNumSingleplayerCharacters);
+#ifndef NON_MATCHING
+    asm(".purgem b");
+#endif
 
     UpdateSpriteAnimation(s);
     DisplaySprite(s);
 }
-END_NONMATCH
 
 void Task_PartyBalloonPopped(void)
 {
