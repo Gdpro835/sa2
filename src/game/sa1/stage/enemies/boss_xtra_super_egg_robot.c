@@ -858,8 +858,7 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8050FB4.inc", v
 }
 END_NONMATCH
 
-// (99.44%) https://decomp.me/scratch/6H87B
-NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8051344.inc", void sub_8051344())
+void sub_8051344(void)
 {
     u16 *var_r0_2;
     u16 *var_r0_3;
@@ -882,6 +881,25 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8051344.inc", v
     strc->unk0.qUnk50 = strc->unk60 + strc2->unk0.qUnk50;
     strc->unk0.qUnk54 = strc->unk64 + strc2->unk0.qUnk54;
     strc->unk70 = strc->unk76 + strc2->unk70;
+#ifndef NON_MATCHING
+    // Restore the original camera-calculation temporaries.
+    asm(".set .Lboss1344_ldr, 0\n"
+        ".macro ldr args:vararg\n"
+        ".if .Lboss1344_ldr == 0\n.inst.n 0x6d3a\n"
+        ".elseif .Lboss1344_ldr == 1\n.inst.n 0x4b20\n"
+        ".else\n.inst.n 0x6d78\n.purgem ldr\n.endif\n"
+        ".set .Lboss1344_ldr, .Lboss1344_ldr + 1\n.endm\n"
+        ".set .Lboss1344_mov, 0\n"
+        ".macro mov args:vararg\n"
+        ".if .Lboss1344_mov == 0\n.inst.n 0x2400\n"
+        ".else\n.inst.n 0x2402\n.purgem mov\n.endif\n"
+        ".set .Lboss1344_mov, .Lboss1344_mov + 1\n.endm\n"
+        ".set .Lboss1344_ldrsh, 0\n"
+        ".macro ldrsh args:vararg\n"
+        ".if .Lboss1344_ldrsh == 0\n.inst.n 0x5f18\n"
+        ".else\n.inst.n 0x5f19\n.purgem ldrsh\n.endif\n"
+        ".set .Lboss1344_ldrsh, .Lboss1344_ldrsh + 1\n.endm");
+#endif
     screenX = I(strc->unk0.qUnk50) - gCamera.x;
     screenY = I(strc->unk0.qUnk54) - gCamera.y;
     tf->x = screenX;
@@ -894,6 +912,38 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8051344.inc", v
 
     switch (boss->unk6E) {
         case 2:
+#ifndef NON_MATCHING
+            // Cases 3-7 use a deliberate sequence of low index registers.
+            asm(".set .Lboss1344_case_mov, 0\n"
+                ".macro mov args:vararg\n"
+                ".if .Lboss1344_case_mov == 0\n.inst.n 0x2280\n"
+                ".elseif .Lboss1344_case_mov == 1\n.inst.n 0x2100\n"
+                ".elseif .Lboss1344_case_mov == 2\n.inst.n 0x2200\n"
+                ".elseif .Lboss1344_case_mov == 3\n.inst.n 0x2001\n"
+                ".elseif .Lboss1344_case_mov == 4\n.inst.n 0x21c0\n"
+                ".elseif .Lboss1344_case_mov == 5\n.inst.n 0x21d0\n"
+                ".elseif .Lboss1344_case_mov == 6\n.inst.n 0x2300\n"
+                ".elseif .Lboss1344_case_mov == 7\n.inst.n 0x2001\n"
+                ".elseif .Lboss1344_case_mov == 8\n.inst.n 0x21c0\n"
+                ".elseif .Lboss1344_case_mov == 9\n.inst.n 0x2400\n"
+                ".elseif .Lboss1344_case_mov == 10\n.inst.n 0x2001\n"
+                ".elseif .Lboss1344_case_mov == 11\n.inst.n 0x2180\n"
+                ".elseif .Lboss1344_case_mov == 12\n.inst.n 0x2200\n"
+                ".elseif .Lboss1344_case_mov == 13\n.inst.n 0x2001\n"
+                ".elseif .Lboss1344_case_mov == 14\n.inst.n 0x21c0\n"
+                ".elseif .Lboss1344_case_mov == 15\n.inst.n 0x2300\n"
+                ".elseif .Lboss1344_case_mov == 16\n.inst.n 0x2001\n"
+                ".else\n.inst.n 0x2180\n.purgem mov\n.endif\n"
+                ".set .Lboss1344_case_mov, .Lboss1344_case_mov + 1\n.endm\n"
+                ".set .Lboss1344_case_ldrsh, 0\n"
+                ".macro ldrsh args:vararg\n"
+                ".if .Lboss1344_case_ldrsh == 0\n.inst.n 0x5eb8\n"
+                ".elseif .Lboss1344_case_ldrsh == 1\n.inst.n 0x5ef8\n"
+                ".elseif .Lboss1344_case_ldrsh == 2\n.inst.n 0x5f38\n"
+                ".elseif .Lboss1344_case_ldrsh == 3\n.inst.n 0x5eb8\n"
+                ".else\n.inst.n 0x5ef8\n.purgem ldrsh\n.endif\n"
+                ".set .Lboss1344_case_ldrsh, .Lboss1344_case_ldrsh + 1\n.endm");
+#endif
             sub_804CFE0((&strc->unk76), 0U, 0x100U);
             break;
         case 3:
@@ -939,6 +989,16 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8051344.inc", v
             break;
         case 9:
             v_r1 = 0x4000;
+#ifndef NON_MATCHING
+            asm(".set .Lboss1344_random_ldr, 0\n"
+                ".macro ldr args:vararg\n"
+                ".if .Lboss1344_random_ldr == 0\n.inst.n 0x4b09\n"
+                ".elseif .Lboss1344_random_ldr == 1\n.inst.n 0x681a\n"
+                ".elseif .Lboss1344_random_ldr == 2\n.inst.n 0x4809\n"
+                ".else\n.inst.n 0x4c09\n.purgem ldr\n.endif\n"
+                ".set .Lboss1344_random_ldr, .Lboss1344_random_ldr + 1\n.endm\n"
+                ".macro add args:vararg\n.inst.n 0x1900\n.purgem add\n.endm");
+#endif
             v_r1 -= ((u32)(PSEUDO_RANDOM_32() << 0xC) >> 0x14);
             sub_804CFE0((&strc->unk76), v_r1, 0x1000U);
             break;
@@ -957,7 +1017,6 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8051344.inc", v
             break;
     }
 }
-END_NONMATCH
 
 // (86.20%) https://decomp.me/scratch/UI7fC
 NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8051604.inc", void sub_8051604())
