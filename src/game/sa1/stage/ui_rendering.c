@@ -101,8 +101,133 @@ void sub_80528AC(Strc_80528AC *param0)
     }
 }
 
-// (86.06%) https://decomp.me/scratch/3jubn
-NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_8052AA4.inc", void sub_8052AA4(void))
+#ifndef NON_MATCHING
+NAKED void sub_8052AA4(void)
+{
+    asm(
+        ".include \"constants/constants.inc\"\n"
+        "\n"
+        ".syntax unified\n"
+        ".text\n"
+        "\tpush {r4, r5, r6, r7, lr}\n"
+        "\tmov r7, sl\n"
+        "\tmov r6, sb\n"
+        "\tmov r5, r8\n"
+        "\tpush {r5, r6, r7}\n"
+        "\tldr r0, _08052B74 @ =gUnknown_030063C0\n"
+        "\tmov ip, r0\n"
+        "\tldr r0, [r0]\n"
+        "\tcmp r0, #0\n"
+        "\tbeq _08052B50\n"
+        "\tldr r1, _08052B78 @ =gTask_03006240\n"
+        "\tmov sl, r1\n"
+        "_08052ABC_loop:\n"
+        "\tmov r2, ip\n"
+        "\tldr r2, [r2]    @ r2 = list\n"
+        "\tmov ip, r2\n"
+        "\tmov r1, sl\n"
+        "\tldr r0, [r1]\n"
+        "\tldrh r1, [r0, #6]\n"
+        "\tmovs r0, #0xc0\n"
+        "\tlsls r0, r0, #0x12\n"
+        "\tadds r5, r1, r0 @ r5 = strc0 = TASK_DATA(gTask_03006240);\n"
+        "\tldr r1, [r2, #0x1c]\n"
+        "\tlsls r0, r1, #1\n"
+        "\tadds r0, r0, r1\n"
+        "\tlsls r0, r0, #2\n"
+        "\tadds r5, r5, r0 @ r5 = strc0\n"
+        "\tldr r1, [r2, #0x14]\n"
+        "\tlsls r1, r1, #6\n"
+        "\tmov r6, ip\n"
+        "\tadds r6, #0x20\n"
+        "\tldrb r3, [r6]   @ r3 = list->unk20\n"
+        "\tldr r0, [r2, #0x10]\n"
+        "\tadds r0, r0, r3\n"
+        "\tlsls r0, r0, #1\n"
+        "\tadds r1, r1, r0 @ r1 = \n"
+        "\tldr r0, [r2, #0x18]\n"
+        "\tlsls r0, r0, #1\n"
+        "\tldr r2, _08052B7C @ =gBgCntRegs\n"
+        "\tadds r0, r0, r2\n"
+        "\tldrh r2, [r0]\n"
+        "\tmovs r0, #0xf8\n"
+        "\tlsls r0, r0, #5     @ r0 = 0x1F00\n"
+        "\tands r0, r2\n"
+        "\tlsls r0, r0, #3\n"
+        "\tadds r1, r1, r0\n"
+        "\tmovs r0, #0xc0\n"
+        "\tlsls r0, r0, #0x13  @ r0 = VRAM\n"
+        "\tadds r0, r0, r1\n"
+        "\tmov sb, r0          @ sb = vram = BG_CHAR_ADDR_FROM_SCREENBASE(list->unk18) + vramOffset;\n"
+        "\tmovs r4, #0\n"
+        "\tmovs r1, #0\n"
+        "\tcmp r1, r3\n"
+        "\tbhs _08052B48\n"
+        "\tmov r8, r6          @ r8 = r6 = &list->unk20\n"
+        "_08052B10:\n"
+        "\tmovs r2, #0\n"
+        "\tadds r7, r1, #1\n"
+        "\tadds r6, r4, #1\n"
+        "\tldrb r0, [r5, #0xb]\n"
+        "\tcmp r2, r0\n"
+        "\tbhs _08052B3C\n"
+        "\tldr r3, [r5, #4]\n"
+        "\tmuls r1, r3, r1\n"
+        "\tmov r0, ip\n"
+        "\tadds r0, #4\n"
+        "\tadds r4, r0, r4\n"
+        "\tadd r1, sb      @ r1 = vram + (strc0->unk4 * i)\n"
+        "_08052B28:\n"
+        "\tldrb r0, [r4]\n"
+        "\tsubs r0, #0x20\n"
+        "\tmuls r0, r3, r0\n"
+        "\tadds r0, r0, r2\n"
+        "\tstrh r0, [r1]\n"
+        "\tadds r1, #0x40\n"
+        "\tadds r2, #1\n"
+        "\tldrb r0, [r5, #0xb]\n"
+        "\tcmp r2, r0\n"
+        "\tblo _08052B28\n"
+        "_08052B3C:\n"
+        "\tadds r1, r7, #0\n"
+        "\tadds r4, r6, #0\n"
+        "\tmov r2, r8\n"
+        "\tldrb r2, [r2]\n"
+        "\tcmp r1, r2\n"
+        "\tblo _08052B10\n"
+        "_08052B48:\n"
+        "\tmov r1, ip\n"
+        "\tldr r0, [r1]\n"
+        "\tcmp r0, #0\n"
+        "\tbne _08052ABC_loop\n"
+        "_08052B50:\n"
+        "\tldr r2, _08052B80 @ =gUnknown_030063F0\n"
+        "\tldr r0, [r2]\n"
+        "\tmov r1, ip\n"
+        "\tstr r0, [r1]\n"
+        "\tldr r2, _08052B74 @ =gUnknown_030063C0\n"
+        "\tldr r0, [r2]\n"
+        "\tldr r1, _08052B80 @ =gUnknown_030063F0\n"
+        "\tstr r0, [r1]\n"
+        "\tmovs r0, #0\n"
+        "\tstr r0, [r2]\n"
+        "\tpop {r3, r4, r5}\n"
+        "\tmov r8, r3\n"
+        "\tmov sb, r4\n"
+        "\tmov sl, r5\n"
+        "\tpop {r4, r5, r6, r7}\n"
+        "\tpop {r0}\n"
+        "\tbx r0\n"
+        "\t.align 2, 0\n"
+        "_08052B74: .4byte gUnknown_030063C0\n"
+        "_08052B78: .4byte gTask_03006240\n"
+        "_08052B7C: .4byte gBgCntRegs\n"
+        "_08052B80: .4byte gUnknown_030063F0\n"
+        "\n"
+        ".syntax divided\n");
+}
+#else
+void sub_8052AA4(void)
 {
     struct Strc_30063F0 *list = &gUnknown_030063C0;
     struct Strc_30063F0 *curr;
@@ -130,8 +255,8 @@ NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_8052AA4.inc", void sub_80
 
         for (i = 0; i < curr->unk20; i++) {
             u16 *dest;
-            for (j = 0, dest = vram + (strc0->unk4 * j); j < strc0->unkB; dest += 0x20, j++) {
-                *dest = (strc0->unk4 * FROM_UI_DIGIT(curr->unk4[j])) + i;
+            for (j = 0, dest = vram + (strc0->unk4 * i); j < strc0->unkB; dest += 0x20, j++) {
+                *dest = (strc0->unk4 * FROM_UI_DIGIT(curr->unk4[i])) + j;
             }
         }
     }
@@ -140,7 +265,7 @@ NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_8052AA4.inc", void sub_80
     gUnknown_030063F0->next = gUnknown_030063C0.next;
     gUnknown_030063C0.next = NULL;
 }
-END_NONMATCH
+#endif
 
 NONMATCH("asm/non_matching/game/sa1/gTask_3006240__unused_8052B84.inc", void unused_8052B84(s32 param0, u16 param1, u16 param2, u8 param3))
 {
