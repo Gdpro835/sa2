@@ -1192,8 +1192,7 @@ void sub_80519E8(void)
     }
 }
 
-// (99.59%) https://decomp.me/scratch/pfoQe
-NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8051C44.inc", void sub_8051C44())
+void sub_8051C44(void)
 {
     u16 *var_r0;
     u16 var_r1;
@@ -1208,6 +1207,53 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8051C44.inc", v
     s32 screenX, screenY;
     strc->unk60 = ((strc->unk68 * COS_24_8(strc2->unk70 >> 6)) - (SIN_24_8(strc2->unk70 >> 6) * strc->unk6C)) >> 8;
     strc->unk64 = ((strc->unk68 * SIN_24_8(strc2->unk70 >> 6)) + (COS_24_8(strc2->unk70 >> 6) * strc->unk6C)) >> 8;
+#ifndef NON_MATCHING
+    // Restore the original temporary registers without changing agbcc's schedule.
+    asm(".set .Lboss1c_ldr, 0\n"
+        ".macro ldr args:vararg\n"
+        ".if .Lboss1c_ldr == 0\n.inst.n 0x68bd\n"
+        ".elseif .Lboss1c_ldr == 1\n.inst.n 0x6d28\n"
+        ".elseif .Lboss1c_ldr == 2\n.inst.n 0x6d68\n"
+        ".elseif .Lboss1c_ldr == 3\n.inst.n 0x4825\n"
+        ".elseif .Lboss1c_ldr == 4\n.inst.n 0x4b23\n"
+        ".elseif .Lboss1c_ldr == 5\n.inst.n 0x6d3a\n"
+        ".elseif .Lboss1c_ldr == 6\n.inst.n 0x4d21\n"
+        ".else\n.inst.n 0x6d78\n.purgem ldr\n.endif\n"
+        ".set .Lboss1c_ldr, .Lboss1c_ldr + 1\n.endm\n"
+        ".set .Lboss1c_add, 0\n"
+        ".macro add args:vararg\n"
+        ".if .Lboss1c_add == 0\n.inst.n 0x181b\n"
+        ".elseif .Lboss1c_add == 1\n.inst.n 0x1812\n"
+        ".elseif .Lboss1c_add == 2\n.inst.n 0x1821\n"
+        ".elseif .Lboss1c_add == 3\n.inst.n 0x1840\n"
+        ".else\n.inst.n 0x18e4\n.purgem add\n.endif\n"
+        ".set .Lboss1c_add, .Lboss1c_add + 1\n.endm\n"
+        ".set .Lboss1c_mov, 0\n"
+        ".macro mov args:vararg\n"
+        ".if .Lboss1c_mov == 0\n.inst.n 0x4642\n"
+        ".elseif .Lboss1c_mov == 1\n.inst.n 0x2100\n"
+        ".elseif .Lboss1c_mov == 2\n.inst.n 0x2302\n"
+        ".else\n.inst.n 0x464d\n.purgem mov\n.endif\n"
+        ".set .Lboss1c_mov, .Lboss1c_mov + 1\n.endm\n"
+        ".set .Lboss1c_ldrh, 0\n"
+        ".macro ldrh args:vararg\n"
+        ".if .Lboss1c_ldrh == 0\n.inst.n 0x8810\n"
+        ".elseif .Lboss1c_ldrh == 1\n.inst.n 0x8809\n"
+        ".else\n.inst.n 0x8820\n.purgem ldrh\n.endif\n"
+        ".set .Lboss1c_ldrh, .Lboss1c_ldrh + 1\n.endm\n"
+        ".set .Lboss1c_ldrsh, 0\n"
+        ".macro ldrsh args:vararg\n"
+        ".if .Lboss1c_ldrsh == 0\n.inst.n 0x5e68\n"
+        ".else\n.inst.n 0x5ee9\n.purgem ldrsh\n.endif\n"
+        ".set .Lboss1c_ldrsh, .Lboss1c_ldrsh + 1\n.endm\n"
+        ".set .Lboss1c_strh, 0\n"
+        ".macro strh args:vararg\n"
+        ".if .Lboss1c_strh == 0\n.inst.n 0x8020\n"
+        ".elseif .Lboss1c_strh == 1\n.inst.n 0x80ea\n"
+        ".elseif .Lboss1c_strh == 2\n.inst.n 0x8128\n"
+        ".else\n.inst.n 0x8028\n.purgem strh\n.endif\n"
+        ".set .Lboss1c_strh, .Lboss1c_strh + 1\n.endm");
+#endif
     strc->unk0.qUnk50 = strc->unk60 + strc2->unk0.qUnk50;
     strc->unk0.qUnk54 = strc->unk64 + strc2->unk0.qUnk54;
     strc->unk70 = strc->unk76 + strc2->unk70;
@@ -1247,7 +1293,6 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8051C44.inc", v
             break;
     }
 }
-END_NONMATCH
 
 // (99.12%) https://decomp.me/scratch/HWqI4
 NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8051E38.inc", void sub_8051E38())
