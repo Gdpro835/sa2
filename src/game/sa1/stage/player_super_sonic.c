@@ -264,11 +264,33 @@ void Player_SuperSonic_8049AB8(Player *p)
     }
 }
 
-// (87.78%) https://decomp.me/scratch/wiHzX
-NONMATCH("asm/non_matching/game/sa1/stage/Player__sub_8049BAC.inc", bool32 sub_8049BAC(Player *p))
+bool32 sub_8049BAC(Player *p)
 {
+#ifndef NON_MATCHING
+    // Restore the original pointer register used by the cooldown test.
+    asm(".set .Lsuper_cd_add, 0\n"
+        ".macro add args:vararg\n"
+        ".if .Lsuper_cd_add == 0\n.inst.n 0x1c11\n"
+        ".else\n.inst.n 0x313d\n.purgem add\n.endif\n"
+        ".set .Lsuper_cd_add, .Lsuper_cd_add + 1\n.endm\n"
+        ".macro ldrb args:vararg\n.inst.n 0x780b\n.purgem ldrb\n.endm\n"
+        ".macro ldrsb args:vararg\n.inst.n 0x5608\n.purgem ldrsb\n.endm\n"
+        ".macro sub args:vararg\n.inst.n 0x1e58\n.purgem sub\n.endm\n"
+        ".macro strb args:vararg\n.inst.n 0x7008\n.purgem strb\n.endm");
+#endif
     if ((p->SA2_LABEL(unk61) == 0) || (--p->SA2_LABEL(unk61) == 0)) {
         if (p->frameInput & gPlayerControls.attack) {
+#ifndef NON_MATCHING
+            // Recompute the field pointer before writing unk61/unk62, as in the original.
+            asm(".macro mov args:vararg\n"
+                ".inst.n 0x1c13\n.inst.n 0x333d\n.inst.n 0x2100\n"
+                ".purgem mov\n.endm\n"
+                ".set .Lsuper_attack_add, 0\n"
+                ".macro add args:vararg\n"
+                ".if .Lsuper_attack_add == 0\n.inst.n 0x3301\n"
+                ".else\n.purgem add\n.endif\n"
+                ".set .Lsuper_attack_add, .Lsuper_attack_add + 1\n.endm");
+#endif
             p->SA2_LABEL(unk61) = 8;
             p->SA2_LABEL(unk62) = 1;
             p->qSpeedGround = Q(4);
@@ -283,7 +305,6 @@ NONMATCH("asm/non_matching/game/sa1/stage/Player__sub_8049BAC.inc", bool32 sub_8
 
     return FALSE;
 }
-END_NONMATCH
 
 // TODO: Fake-match
 void Player_SuperSonic_8049C0C(Player *p)
