@@ -1070,8 +1070,7 @@ void sub_80518E8()
     sub_804CFE0(&strc->unk76, 0U, 0x100U);
 }
 
-// (99.62%) https://decomp.me/scratch/OHVMq
-NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_80519E8.inc", void sub_80519E8())
+void sub_80519E8(void)
 {
     u16 *var_r0;
     u16 var_r1;
@@ -1086,6 +1085,53 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_80519E8.inc", v
     s32 screenX, screenY;
     strc->unk60 = ((strc->unk68 * COS_24_8(strc2->unk70 >> 6)) - (SIN_24_8(strc2->unk70 >> 6) * strc->unk6C)) >> 8;
     strc->unk64 = ((strc->unk68 * SIN_24_8(strc2->unk70 >> 6)) + (COS_24_8(strc2->unk70 >> 6) * strc->unk6C)) >> 8;
+#ifndef NON_MATCHING
+    // Restore the original temporary registers without changing agbcc's schedule.
+    asm(".set .Lboss19_ldr, 0\n"
+        ".macro ldr args:vararg\n"
+        ".if .Lboss19_ldr == 0\n.inst.n 0x9d00\n"
+        ".elseif .Lboss19_ldr == 1\n.inst.n 0x6d28\n"
+        ".elseif .Lboss19_ldr == 2\n.inst.n 0x6d68\n"
+        ".elseif .Lboss19_ldr == 3\n.inst.n 0x4825\n"
+        ".elseif .Lboss19_ldr == 4\n.inst.n 0x4b23\n"
+        ".elseif .Lboss19_ldr == 5\n.inst.n 0x6d3a\n"
+        ".elseif .Lboss19_ldr == 6\n.inst.n 0x4d21\n"
+        ".else\n.inst.n 0x6d78\n.purgem ldr\n.endif\n"
+        ".set .Lboss19_ldr, .Lboss19_ldr + 1\n.endm\n"
+        ".set .Lboss19_add, 0\n"
+        ".macro add args:vararg\n"
+        ".if .Lboss19_add == 0\n.inst.n 0x181b\n"
+        ".elseif .Lboss19_add == 1\n.inst.n 0x1812\n"
+        ".elseif .Lboss19_add == 2\n.inst.n 0x1821\n"
+        ".elseif .Lboss19_add == 3\n.inst.n 0x1840\n"
+        ".else\n.inst.n 0x18e4\n.purgem add\n.endif\n"
+        ".set .Lboss19_add, .Lboss19_add + 1\n.endm\n"
+        ".set .Lboss19_mov, 0\n"
+        ".macro mov args:vararg\n"
+        ".if .Lboss19_mov == 0\n.inst.n 0x4642\n"
+        ".elseif .Lboss19_mov == 1\n.inst.n 0x2100\n"
+        ".elseif .Lboss19_mov == 2\n.inst.n 0x2302\n"
+        ".else\n.inst.n 0x4655\n.purgem mov\n.endif\n"
+        ".set .Lboss19_mov, .Lboss19_mov + 1\n.endm\n"
+        ".set .Lboss19_ldrh, 0\n"
+        ".macro ldrh args:vararg\n"
+        ".if .Lboss19_ldrh == 0\n.inst.n 0x8810\n"
+        ".elseif .Lboss19_ldrh == 1\n.inst.n 0x8809\n"
+        ".else\n.inst.n 0x8820\n.purgem ldrh\n.endif\n"
+        ".set .Lboss19_ldrh, .Lboss19_ldrh + 1\n.endm\n"
+        ".set .Lboss19_ldrsh, 0\n"
+        ".macro ldrsh args:vararg\n"
+        ".if .Lboss19_ldrsh == 0\n.inst.n 0x5e68\n"
+        ".else\n.inst.n 0x5ee9\n.purgem ldrsh\n.endif\n"
+        ".set .Lboss19_ldrsh, .Lboss19_ldrsh + 1\n.endm\n"
+        ".set .Lboss19_strh, 0\n"
+        ".macro strh args:vararg\n"
+        ".if .Lboss19_strh == 0\n.inst.n 0x8020\n"
+        ".elseif .Lboss19_strh == 1\n.inst.n 0x80ea\n"
+        ".elseif .Lboss19_strh == 2\n.inst.n 0x8128\n"
+        ".else\n.inst.n 0x8028\n.purgem strh\n.endif\n"
+        ".set .Lboss19_strh, .Lboss19_strh + 1\n.endm");
+#endif
     strc->unk0.qUnk50 = strc->unk60 + strc2->unk0.qUnk50;
     strc->unk0.qUnk54 = strc->unk64 + strc2->unk0.qUnk54;
     strc->unk70 = strc->unk76 + strc2->unk70;
@@ -1126,6 +1172,10 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_80519E8.inc", v
         case 13:
             sub_804CFE0(&strc->unk76, 0x4000U, 0x200U);
             if ((boss->unk69 == 0) && (strc->unk76 == 0x4000)) {
+#ifndef NON_MATCHING
+                asm(".macro mov args:vararg\n.inst.n 0x2500\n.purgem mov\n.endm\n"
+                    ".macro ldrsh args:vararg\n.inst.n 0x5f78\n.purgem ldrsh\n.endm");
+#endif
                 boss->unk5C |= 1 << strc->unk0.unk0;
             }
             break;
@@ -1141,7 +1191,6 @@ NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_80519E8.inc", v
             break;
     }
 }
-END_NONMATCH
 
 // (99.59%) https://decomp.me/scratch/pfoQe
 NONMATCH("asm/non_matching/game/sa1/stage/enemies/boss_xtra__sub_8051C44.inc", void sub_8051C44())
