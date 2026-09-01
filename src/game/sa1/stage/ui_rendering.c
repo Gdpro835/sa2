@@ -801,11 +801,16 @@ void sub_80535C8(struct Strc0 *inTask, u8 param1)
     src->unkB = inTask->unkB;
 }
 
-// (94.42%) https://decomp.me/scratch/QDnYo
-NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_80535FC.inc", void sub_80535FC(void))
+void sub_80535FC(void)
 {
     if (gTask_03006240 == NULL) {
-        struct Strc_3006250 *zeroth = &gUnknown_03006250[0];
+#ifndef NON_MATCHING
+        register struct Strc_3006250 *base asm("r2") = &gUnknown_03006250[0];
+        register struct Strc_3006250 *zeroth asm("r3");
+#else
+        struct Strc_3006250 *base = &gUnknown_03006250[0];
+        struct Strc_3006250 *zeroth;
+#endif
         struct Strc_30063F0 **test = &gUnknown_030063F0;
         struct Strc_30063F0 *test2 = &gUnknown_030063C0;
 #ifndef NON_MATCHING
@@ -814,10 +819,13 @@ NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_80535FC.inc", void sub_80
         void *taskPtr = Task_80536D4;
 #endif
         void *dtorPtr = TaskDestructor_80536D8;
-        struct Strc_3006250 *second = &gUnknown_03006250[ARRAY_COUNT(gUnknown_03006250) - 1];
-        struct Strc_3006250 *curr = &gUnknown_03006250[ARRAY_COUNT(gUnknown_03006250) - 2];
+        struct Strc_3006250 *second;
+        struct Strc_3006250 *curr;
         void *nullPtr;
 
+        zeroth = base;
+        second = &base[ARRAY_COUNT(gUnknown_03006250) - 1];
+        curr = &base[ARRAY_COUNT(gUnknown_03006250) - 2];
         do {
             curr->next = second;
 
@@ -825,14 +833,13 @@ NONMATCH("asm/non_matching/game/sa1/gTask_3006240__sub_80535FC.inc", void sub_80
         } while ((intptr_t)curr >= (intptr_t)zeroth);
 
         nullPtr = NULL;
-        gUnknown_03006250[ARRAY_COUNT(gUnknown_03006250) - 1].next = nullPtr;
-        *test = (void *)&gUnknown_03006250[0];
+        base[ARRAY_COUNT(gUnknown_03006250) - 1].next = nullPtr;
+        *test = (void *)base;
         test2->next = nullPtr;
         gTask_03006240 = TaskCreate(taskPtr, sizeof(Task_3006240), 0x1800, 0, dtorPtr);
         UiGfxStackInit();
     }
 }
-END_NONMATCH
 
 IwramData UiGfxStackInit(void)
 {
